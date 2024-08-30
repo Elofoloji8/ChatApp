@@ -161,7 +161,7 @@ fun LoginScreen(navController: NavController){
                 Spacer(modifier = Modifier.height(50.dp))
 
                 OutlinedTextField(
-                    value = "",
+                    value = username,
                     onValueChange = { username = it },
                     label = { Text("Kullanıcı Adı") },
                     modifier = Modifier
@@ -173,7 +173,7 @@ fun LoginScreen(navController: NavController){
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = "",
+                    value = password,
                     onValueChange = { password = it },
                     label = { Text("Şifre") },
                     modifier = Modifier

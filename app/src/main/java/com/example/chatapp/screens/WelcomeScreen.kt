@@ -29,6 +29,7 @@ fun WelcomeScreen(navController: NavController){
 
     val animatedScale by animateFloatAsState(
         targetValue = scale,
+        //Düzeltilecek
         animationSpec = tween(durationMillis = 1000)
     )
 
