@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChatAppTheme {
                 AppNavigation()
+                /*deneme2*/
 
                 /*deneme1*/
             }
