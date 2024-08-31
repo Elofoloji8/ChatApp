@@ -18,13 +18,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ChatAppTheme {
+            ChatAppTheme{
                 AppNavigation()
-                /*deneme2*/
-
-                /*deneme1*/
-                // deneme 3/
-                // DENEME 4
             }
         }
     }
