@@ -1,5 +1,6 @@
 package com.example.chatapp.screens
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -29,7 +30,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -46,11 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chatapp.R
+import com.example.chatapp.models.Database
 import com.example.chatapp.navigations.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController, database : Database){
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -65,6 +70,23 @@ fun LoginScreen(navController: NavController){
         targetValue = if (isLoggedIn) 80.dp else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
+
+    // Kullanıcının giriş doğrulama sürecini tutar
+    val authState = database.authState.observeAsState()
+    // Mevcut ortamı alır
+    val context = LocalContext.current
+
+    // Kullanıcının giriş durumuna göre işlem yapar. Eğer giriş başarılıysa kullanıcı home ekranına yönlendirilir.
+    // Eğer giriş başarısızsa ekrana kısa bir süreliğine toast mesajı şeklinde neden başarısız olduğunu anlatan bir mesaj görünür
+    LaunchedEffect(authState.value) {
+        when(authState.value){
+            is Database.AuthState.Authenticated -> navController.navigate(Routes.screenHome)
+            is Database.AuthState.Error -> Toast.makeText(context,
+                (authState.value as Database.AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            // Diğer durumlar için hiçbir şey yapma
+            else -> Unit
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -94,7 +116,7 @@ fun LoginScreen(navController: NavController){
             Button(
                 onClick = {
                     if (isLoggedIn) {
-                        navController.navigate(Routes.screenHome)
+                        database.signin(username,password)
                     } else {
                         isLoggedIn = true
                     } },

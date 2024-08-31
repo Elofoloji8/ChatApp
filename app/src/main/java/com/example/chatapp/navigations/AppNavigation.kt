@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.chatapp.models.Database
+import com.example.chatapp.screens.AdminPanelScreen
 import com.example.chatapp.screens.HomeScreen
 import com.example.chatapp.screens.LoginScreen
 import com.example.chatapp.screens.WelcomeScreen
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation(database : Database){
 
 
     val navController = rememberNavController()
@@ -21,10 +23,13 @@ fun AppNavigation(){
         }
         composable(Routes.screenLogin)
         {
-            LoginScreen(navController)
+            LoginScreen(navController, database)
         }
         composable(Routes.screenHome){
-            HomeScreen(navController)
+            HomeScreen(navController, database)
+        }
+        composable(Routes.screenAdminPanel){
+            AdminPanelScreen(navController, database)
         }
     })
 }
