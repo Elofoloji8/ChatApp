@@ -23,7 +23,8 @@ class MainActivity : ComponentActivity() {
                 /*deneme2*/
 
                 /*deneme1*/
-                // deneme 3
+                // deneme 3/
+                // DENEME 4
             }
         }
     }
