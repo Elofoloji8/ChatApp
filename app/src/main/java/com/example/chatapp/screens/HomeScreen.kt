@@ -86,7 +86,7 @@ fun HomeScreen(navController: NavController, database: Database){
             ) {
                 DropdownMenuItem( text = { Text("Admin panel") },
                     onClick = {
-                        // "Çıkış Yap" seçeneğine tıklandığında yapılacak işlemler
+                        // "Admin panel" seçeneğine tıklandığında yapılacak işlemler
                         expanded = false
                         navController.navigate(Routes.screenAdminPanel)
                     }

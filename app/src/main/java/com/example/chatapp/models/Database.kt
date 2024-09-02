@@ -48,14 +48,23 @@ class Database : ViewModel(){
         _authState.value = AuthState.Loading
 
         // Firebase Authentication ile email ve şifre kullanarak giriş yapar.
-        auth.signInWithEmailAndPassword(email,password)
-            .addOnCompleteListener{
-                // Giriş işlemi başarılıysa, kimlik doğrulama durumu kimlik doğrulandı olarak ayarlanır
-                if(it.isSuccessful){
-                    _authState.value = AuthState.Authenticated
-                }else{
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .whereEqualTo("password", password)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val documents = task.result
+                    if (!documents.isEmpty) {
+                        // Giriş işlemi başarılı, kimlik doğrulama durumu ayarlanır
+                        _authState.value = AuthState.Authenticated
+                    } else {
+                        // Kullanıcı bulunamadı, hata mesajı döndürülür
+                        _authState.value = AuthState.Error("Invalid email or password")
+                    }
+                } else {
                     // Giriş işlemi başarısızsa, hata mesajı ile birlikte error mesajı verilir
-                    _authState.value = AuthState.Error(it.exception?.message?:"Something went wrong")
+                    _authState.value = AuthState.Error(task.exception?.message ?: "Something went wrong")
                 }
             }
     }
@@ -70,9 +79,36 @@ class Database : ViewModel(){
             "role_area" to area
         )
 
-        db.collection("role_registration").add(personMap)
+        var roleId: Long? = null
+
+        db.collection("user_registration").add(personMap)
             .addOnSuccessListener {
                 Toast.makeText(context,"basarili kayit",Toast.LENGTH_SHORT).show()
+
+                db.collection("roles")
+                    .whereEqualTo("role_name", role)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        if (!querySnapshot.isEmpty) {
+                            val document = querySnapshot.documents[0]
+                            roleId = document.getLong("role_id")
+
+                            val userMap = hashMapOf(
+                                "email" to email,
+                                "password" to password,
+                                "role_id" to roleId,
+                            )
+
+                            db.collection("users").add(userMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context,"basarili kayitttttt",Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(context, "Kayıt sırasında hata: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    println(e)
+                                }
+                        }
+                    }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Kayıt sırasında hata: ${e.message}", Toast.LENGTH_SHORT).show()
