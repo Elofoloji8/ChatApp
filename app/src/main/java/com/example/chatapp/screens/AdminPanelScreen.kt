@@ -41,7 +41,7 @@ import com.example.chatapp.models.Database
 @Composable
 fun AdminPanelScreen(navController: NavController, database: Database) {
 
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var selectedRole by remember { mutableStateOf("Rol") }
@@ -49,7 +49,7 @@ fun AdminPanelScreen(navController: NavController, database: Database) {
     var expandedRole by remember { mutableStateOf(false) } // Dropdown'un açık olup olmadığını kontrol eder
     var expandedArea by remember { mutableStateOf(false) }
 
-    val roles = listOf("Proje Yöneticisi", "Asistan", "Çalışan") // Dropdown menü seçenekleri
+    val roles = listOf("project manager", "assistant", "worker") // Dropdown menü seçenekleri
     val areas = listOf("Web", "Mobil", "Yapay zeka", "Veri tabanı")
     val context = LocalContext.current
 
@@ -62,8 +62,8 @@ fun AdminPanelScreen(navController: NavController, database: Database) {
         Spacer(modifier = Modifier.size(100.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
+            value = email,
+            onValueChange = { email = it },
             label = { Text("Kullanıcı Adı") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -152,8 +152,11 @@ fun AdminPanelScreen(navController: NavController, database: Database) {
         ) {
             Button(
                 onClick = {
-                    database.registerPerson(username, password, selectedRole, selectedArea, context)
-                          println("kullanıcı adı: $username sifre: $password  rol: $selectedRole alan: $selectedArea")
+                    if (isValidEmail(email)) {
+                        database.registerPerson(email, password, selectedRole, selectedArea, context)
+                    } else {
+                        println("email: $email sifre: $password  rol: $selectedRole alan: $selectedArea")
+                    }
                 },
                 modifier = Modifier
                     .fillMaxSize(),
@@ -172,13 +175,11 @@ fun AdminPanelScreen(navController: NavController, database: Database) {
                 )
             }
         }
-        
-
-
-
-
-
     }
 
 
+
+}
+fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
