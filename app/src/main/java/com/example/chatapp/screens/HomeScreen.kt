@@ -41,16 +41,18 @@ import com.example.chatapp.navigations.Routes
 fun HomeScreen(navController: NavController, database: Database){
 
     var expanded by remember { mutableStateOf(false) }
-
     val authState = database.authState.observeAsState()
 
     LaunchedEffect(authState.value) {
-        when(authState.value){
+        when (authState.value) {
             is Database.AuthState.Unauthenticated -> navController.navigate(Routes.screenLogin)
             // Diğer durumlar için hiçbir şey yapma
             else -> Unit
         }
     }
+
+    // Kullanıcının e-posta adresini al
+    val currentUserEmail = database.getCurrentUserEmail()
 
     Row(
         modifier = Modifier
@@ -84,13 +86,16 @@ fun HomeScreen(navController: NavController, database: Database){
                 onDismissRequest = { expanded = false },
                 offset = DpOffset(x = 24.dp / 2, y = 24.dp)
             ) {
-                DropdownMenuItem( text = { Text("Admin panel") },
-                    onClick = {
-                        // "Admin panel" seçeneğine tıklandığında yapılacak işlemler
-                        expanded = false
-                        navController.navigate(Routes.screenAdminPanel)
-                    }
-                )
+                if (currentUserEmail == "admin@gmail.com") {
+                    DropdownMenuItem(
+                        text = { Text("Admin panel") },
+                        onClick = {
+                            // "Admin panel" seçeneğine tıklandığında yapılacak işlemler
+                            expanded = false
+                            navController.navigate(Routes.screenAdminPanel)
+                        }
+                    )
+                }
                 DropdownMenuItem( text = { Text("Çıkış Yap") },
                     onClick = {
                         // "Çıkış Yap" seçeneğine tıklandığında yapılacak işlemler

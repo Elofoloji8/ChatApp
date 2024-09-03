@@ -122,8 +122,9 @@ class Database : ViewModel(){
 
 
 
-
-
+    fun getCurrentUserEmail(): String? {
+        return auth.currentUser?.email
+    }
 
 
 
