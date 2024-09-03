@@ -116,7 +116,7 @@ fun LoginScreen(navController: NavController, database : Database){
             Button(
                 onClick = {
                     if (isLoggedIn) {
-                        database.signin(username,password)
+                        database.signIn(username,password)
                     } else {
                         isLoggedIn = true
                     } },
