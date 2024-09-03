@@ -37,7 +37,7 @@ class Database : ViewModel(){
         }
     }
 
-    fun signin(email : String, password : String){
+    fun signIn(email : String, password : String){
         // Eğer kullanıcı email veya şifre alanlarını boş bırakmışsa hata mesajı döner ve fonksiyon sonlanır
         if (email.isEmpty() || password.isEmpty()){
             _authState.value = AuthState.Error("Email or password can't be empty")
@@ -46,25 +46,18 @@ class Database : ViewModel(){
 
         // Giriş işlemi başladığında loading durumunu ayarlar
         _authState.value = AuthState.Loading
+        // Giriş işlemi başladığında loading durumunu ayarlar
+        _authState.value = AuthState.Loading
 
         // Firebase Authentication ile email ve şifre kullanarak giriş yapar.
-        db.collection("users")
-            .whereEqualTo("email", email)
-            .whereEqualTo("password", password)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val documents = task.result
-                    if (!documents.isEmpty) {
-                        // Giriş işlemi başarılı, kimlik doğrulama durumu ayarlanır
-                        _authState.value = AuthState.Authenticated
-                    } else {
-                        // Kullanıcı bulunamadı, hata mesajı döndürülür
-                        _authState.value = AuthState.Error("Invalid email or password")
-                    }
-                } else {
+        auth.signInWithEmailAndPassword(email,password)
+            .addOnCompleteListener{
+                // Giriş işlemi başarılıysa, kimlik doğrulama durumu kimlik doğrulandı olarak ayarlanır
+                if(it.isSuccessful){
+                    _authState.value = AuthState.Authenticated
+                }else{
                     // Giriş işlemi başarısızsa, hata mesajı ile birlikte error mesajı verilir
-                    _authState.value = AuthState.Error(task.exception?.message ?: "Something went wrong")
+                    _authState.value = AuthState.Error(it.exception?.message?:"Something went wrong")
                 }
             }
     }
@@ -72,73 +65,67 @@ class Database : ViewModel(){
 
     fun registerPerson(email : String, password : String, role : String, area: String, context: Context){
 
-        val personMap = hashMapOf(
-            "email" to email,
-            "password" to password,
-            "role_name" to role,
-            "role_area" to area
-        )
-
-        var roleId: Long? = null
-
-        db.collection("user_registration").add(personMap)
-            .addOnSuccessListener {
-                Toast.makeText(context,"basarili kayit",Toast.LENGTH_SHORT).show()
-
-                db.collection("roles")
-                    .whereEqualTo("role_name", role)
-                    .get()
-                    .addOnSuccessListener { querySnapshot ->
-                        if (!querySnapshot.isEmpty) {
-                            val document = querySnapshot.documents[0]
-                            roleId = document.getLong("role_id")
-
-                            val userMap = hashMapOf(
-                                "email" to email,
-                                "password" to password,
-                                "role_id" to roleId,
-                            )
-
-                            db.collection("users").add(userMap)
-                                .addOnSuccessListener {
-                                    Toast.makeText(context,"basarili kayitttttt",Toast.LENGTH_SHORT).show()
-                                }
-                                .addOnFailureListener { e ->
-                                    Toast.makeText(context, "Kayıt sırasında hata: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    println(e)
-                                }
-                        }
-                    }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Kayıt sırasında hata: ${e.message}", Toast.LENGTH_SHORT).show()
-                println(e)
-            }
-
-        /*
-        // Eğer kullanıcı email veya şifre alanlarını boş bırakmışsa hata mesajı döner ve fonksiyon sonlanır
         if (email.isEmpty() || password.isEmpty()){
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
         }
 
-        // Kayıt işlemi başladığında loading durumunu ayarlar
-        _authState.value = AuthState.Loading
+        var roleId: Long? = null
+        var areaId: Long? = null
 
-        // Firebase Authentication ile email ve şifre kullanarak yeni bir kullanıcı oluşturulur
-        auth.createUserWithEmailAndPassword(email,password)
-            .addOnCompleteListener{
-                // Kayıt işlemi başarılıysa, kimlik doğrulama durumu kimlik doğrulandı olarak ayarlanır
-                if(it.isSuccessful){
-                    _authState.value = AuthState.Authenticated
-                }else{
-                    // Kayıt işlemi başarısızsa, hata mesajı ile birlikte error mesajı verilir
-                    _authState.value = AuthState.Error(it.exception?.message?:"Something went wrong")
+        db.collection("roles")
+            .whereEqualTo("role_name", role)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    roleId = document.getLong("role_id")
                 }
             }
-            */
 
+        db.collection("areas")
+            .whereEqualTo("area_name", area)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    areaId = document.getLong("area_id")
+                }
+            }
+
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    val userId = user?.uid
+                    val userMap = hashMapOf(
+                        "email" to email,
+                        "password" to password,
+                        "role_id" to roleId,
+                        "area_id" to areaId
+                    )
+                    userId?.let {
+                        db.collection("user_registration").document(it).set(userMap)
+                            .addOnSuccessListener {
+                                // Kullanıcı bilgileri başarıyla kaydedildi
+                            }
+                            .addOnFailureListener { e ->
+                                // Hata durumunda işlem yapın
+                            }
+                    }
+                } else {
+                    // Kayıt başarısız, hata mesajını işleyin
+                }
+            }
     }
+
+
+
+
+
+
+
 
 
     // Kullanıcının oturumunu kapatır ve kimlik doğrulama durumunu kimlik doğrulanmadı olarak ayarlar

@@ -49,8 +49,8 @@ fun AdminPanelScreen(navController: NavController, database: Database) {
     var expandedRole by remember { mutableStateOf(false) } // Dropdown'un açık olup olmadığını kontrol eder
     var expandedArea by remember { mutableStateOf(false) }
 
-    val roles = listOf("project manager", "assistant", "worker") // Dropdown menü seçenekleri
-    val areas = listOf("Web", "Mobil", "Yapay zeka", "Veri tabanı")
+    val roles = listOf("Project Manager", "Assistant", "Worker") // Dropdown menü seçenekleri
+    val areas = listOf("Web", "Mobile", "Artifical Intelligence", "Database")
     val context = LocalContext.current
 
     Column(
