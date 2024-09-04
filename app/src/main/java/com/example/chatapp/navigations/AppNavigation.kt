@@ -8,6 +8,7 @@ import com.example.chatapp.models.Database
 import com.example.chatapp.screens.AdminPanelScreen
 import com.example.chatapp.screens.HomeScreen
 import com.example.chatapp.screens.LoginScreen
+import com.example.chatapp.screens.ProfileScreen
 import com.example.chatapp.screens.WelcomeScreen
 
 @Composable
@@ -30,6 +31,9 @@ fun AppNavigation(database : Database){
         }
         composable(Routes.screenAdminPanel){
             AdminPanelScreen(navController, database)
+        }
+        composable(Routes.screenProfile){
+            ProfileScreen()
         }
     })
 }
