@@ -13,6 +13,8 @@ firebaseAuth = "23.0.0"
 firebaseCrashlyticsBuildtools = "3.0.2"
 runtimeLivedata = "1.6.8"
 firebaseFirestore = "25.1.0"
+volley = "1.2.1"
+firebaseStorageKtx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +36,8 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

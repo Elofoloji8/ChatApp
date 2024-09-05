@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.firestore)
+    implementation(libs.volley)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -74,4 +76,5 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
     implementation ("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
     implementation ("androidx.compose.material:material-icons-extended")
+    implementation("io.coil-kt:coil-compose:2.2.2")
 }
