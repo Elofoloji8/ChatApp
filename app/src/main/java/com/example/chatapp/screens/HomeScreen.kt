@@ -124,7 +124,7 @@ fun HomeScreen(navController: NavController, database: Database){
                             onClick = {
                                 // "Çıkış Yap" seçeneğine tıklandığında yapılacak işlemler
                                 expanded = false
-                                database.signout()
+                                database.signOut()
                             }
                         )
                     }

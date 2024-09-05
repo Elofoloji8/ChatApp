@@ -1,6 +1,8 @@
 package com.example.chatapp.models
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +12,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class Database : ViewModel(){
 
@@ -44,8 +48,6 @@ class Database : ViewModel(){
             return
         }
 
-        // Giriş işlemi başladığında loading durumunu ayarlar
-        _authState.value = AuthState.Loading
         // Giriş işlemi başladığında loading durumunu ayarlar
         _authState.value = AuthState.Loading
 
@@ -126,11 +128,81 @@ class Database : ViewModel(){
         return auth.currentUser?.email
     }
 
+    fun saveUserProfile(userName: String, aboutMe: String, imageUri: String?) {
+        // Profil resmini Firebase Storage'a yükle ve URL'sini al
+        val userId = auth.currentUser?.uid
+        val storageRef: StorageReference = FirebaseStorage.getInstance().reference
+        Log.e("Saturn",imageUri.toString())
+        val profileImagesRef = imageUri?.let {
+            storageRef.child("profile_images/${userId}.jpg")
+        }
+
+        profileImagesRef?.putFile(Uri.parse(imageUri))?.addOnSuccessListener { taskSnapshot ->
+            // Resim yüklendikten sonra URL'sini al
+            profileImagesRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                val imageUrl = downloadUri.toString()
+                Log.e("Saturn",imageUrl)
+                saveProfile(userId.toString(), userName, aboutMe, imageUrl)
+            }
+        }?.addOnFailureListener { e ->
+            Log.e("Database", "Resim URL'si alınırken hata oluştu", e)
+            // Resim yükleme hatası, resim URL'siz olarak Firestore'a kaydet
+            saveProfile(userId.toString(), userName, aboutMe, null)
+        } ?: run {
+            // Resim yoksa direkt olarak Firestore'a kaydet
+            saveProfile(userId.toString(), userName, aboutMe, null)
+        }
+    }
+
+    fun saveProfile(userId: String, userName: String, aboutMe: String, imageUrl: String?) {
+        val userProfile = hashMapOf(
+            "name" to userName,
+            "about_me" to aboutMe,
+            "profile_image" to imageUrl
+        )
+
+        // Kullanıcı profili koleksiyonuna veri ekleme
+        if (imageUrl != null){
+            db.collection("user_profile").document(userId)
+                .set(userProfile)
+                .addOnSuccessListener {
+                    // Veriler başarılı bir şekilde kaydedildi
+                }
+                .addOnFailureListener { e ->
+                    // Veri kaydetme hatası
+                }
+        }
+
+    }
+
+
+    fun getUserProfile(userId: String, onResult: (String, String, Uri?) -> Unit) {
+        db.collection("user_profile").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val userName = document.getString("name") ?: ""
+                    val aboutMe = document.getString("about_me") ?: ""
+                    val imageUrl = document.getString("profile_image")
+                    val imageUri = imageUrl?.let { Uri.parse(it) }
+                    onResult(userName, aboutMe, imageUri)
+                } else {
+                    // Document not found, handle accordingly
+                    onResult("", "", null)
+                }
+            }
+            .addOnFailureListener { e ->
+                // Handle the error
+                onResult("", "", null)
+            }
+    }
+
+
 
 
 
     // Kullanıcının oturumunu kapatır ve kimlik doğrulama durumunu kimlik doğrulanmadı olarak ayarlar
-    fun signout(){
+    fun signOut(){
         auth.signOut()
         _authState.value = AuthState.Unauthenticated
     }
