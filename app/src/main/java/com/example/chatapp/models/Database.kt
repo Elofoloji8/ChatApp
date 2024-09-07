@@ -1,12 +1,16 @@
 package com.example.chatapp.models
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.chatapp.R
+import com.example.chatapp.data.UserProfile
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
@@ -14,6 +18,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import java.io.File
+import java.io.FileOutputStream
 
 class Database : ViewModel(){
 
@@ -64,9 +70,21 @@ class Database : ViewModel(){
             }
     }
 
+    fun getUriFromDrawable(context: Context, drawableId: Int): Uri? {
+        val bitmap = BitmapFactory.decodeResource(context.resources, drawableId)
+        return bitmap?.let { saveBitmapToFile(context, it) }?.let { Uri.fromFile(it) }
+    }
+
+    fun saveBitmapToFile(context: Context, bitmap: Bitmap): File {
+        val file = File(context.cacheDir, "temp_image.png")
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        return file
+    }
+
 
     fun registerPerson(email : String, password : String, role : String, area: String, context: Context){
-
         if (email.isEmpty() || password.isEmpty()){
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
@@ -74,6 +92,7 @@ class Database : ViewModel(){
 
         var roleId: Long? = null
         var areaId: Long? = null
+        val userName = email.split("@").firstOrNull() ?: ""
 
         db.collection("roles")
             .whereEqualTo("role_name", role)
@@ -95,9 +114,9 @@ class Database : ViewModel(){
                 }
             }
 
-
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
+                Toast.makeText(context,"Kullanici kayit ediliyor lütfen bekleyin.",Toast.LENGTH_SHORT).show()
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     val userId = user?.uid
@@ -111,6 +130,19 @@ class Database : ViewModel(){
                         db.collection("user_registration").document(it).set(userMap)
                             .addOnSuccessListener {
                                 // Kullanıcı bilgileri başarıyla kaydedildi
+                                // Adminin oturumunu tekrar aç
+                                saveUserProfile(userName,"",getUriFromDrawable(context,R.drawable.image_pick_icon).toString())
+
+                                auth.signInWithEmailAndPassword("admin@gmail.com","admin123")
+                                    .addOnCompleteListener { adminLoginTask ->
+                                        if (adminLoginTask.isSuccessful) {
+                                            Toast.makeText(context,"Kullanici kayit edildi...",Toast.LENGTH_SHORT).show()
+                                            // Admin oturumu başarıyla açıldı
+                                            // Admini tekrar ana sayfaya yönlendirin
+                                        } else {
+                                            // Admin oturumu açma hatası
+                                        }
+                                    }
                             }
                             .addOnFailureListener { e ->
                                 // Hata durumunda işlem yapın
@@ -172,7 +204,6 @@ class Database : ViewModel(){
                     // Veri kaydetme hatası
                 }
         }
-
     }
 
 
@@ -197,6 +228,31 @@ class Database : ViewModel(){
             }
     }
 
+    fun getAllUserProfile(onResult: (List<UserProfile>) -> Unit) {
+        val currentUserId = auth.currentUser?.uid
+        db.collection("user_profile")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val userList = mutableListOf<UserProfile>()
+                for (document in querySnapshot.documents) {
+                    val userId = document.id // Document ID'yi al
+                    // Mevcut kullanıcıyı hariç tut
+                    if (userId == currentUserId) continue
+                    val userName = document.getString("name") ?: ""
+                    val about = document.getString("about_me") ?: ""
+                    val imageUrl = document.getString("profile_image")
+                    val imageUri = imageUrl?.let { Uri.parse(it) }
+                    val userProfile = UserProfile(userName, about, imageUri)
+                    userList.add(userProfile)
+                }
+                onResult(userList)
+            }
+            .addOnFailureListener {
+                // Handle error
+                onResult(emptyList())
+            }
+    }
+
 
 
 
@@ -218,5 +274,7 @@ class Database : ViewModel(){
         object Loading : AuthState()
         data class Error(val message : String) : AuthState()
     }
+
+
 
 }
