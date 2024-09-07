@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -135,6 +137,17 @@ fun HomeScreen(navController: NavController, database: Database){
             when(selectedIndex){
                 1 -> ProfileScreen()
             }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navController.navigate(Routes.screenContacts)
+            },
+              containerColor = Color(0xFF38B6FF),
+              contentColor = Color.White
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "")
+
+            }                   
         },
         bottomBar = {
             NavigationBar(

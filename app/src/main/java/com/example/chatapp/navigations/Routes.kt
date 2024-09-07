@@ -7,4 +7,5 @@ object Routes {
     var screenHome = "screen_Home"
     var screenAdminPanel = "screen_Admin_Panel"
     var screenProfile = "screen_Profile"
+    var screenContacts = "screen_Contacts"
 }

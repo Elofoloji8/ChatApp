@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.models.Database
 import com.example.chatapp.screens.AdminPanelScreen
+import com.example.chatapp.screens.ContactsScreen
 import com.example.chatapp.screens.HomeScreen
 import com.example.chatapp.screens.LoginScreen
 import com.example.chatapp.screens.ProfileScreen
@@ -34,6 +35,9 @@ fun AppNavigation(database : Database){
         }
         composable(Routes.screenProfile){
             ProfileScreen()
+        }
+        composable(Routes.screenContacts){
+            ContactsScreen(navController, database)
         }
     })
 }
