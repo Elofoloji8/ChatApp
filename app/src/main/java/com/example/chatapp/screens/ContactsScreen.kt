@@ -66,7 +66,7 @@ fun ContactsScreen(navController: NavController,database: Database) {
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(Color(0xFF38B6FF))
+            .background(Color(0xFF778899))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

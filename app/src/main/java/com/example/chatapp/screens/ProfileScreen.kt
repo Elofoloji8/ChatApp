@@ -113,11 +113,11 @@ fun ProfileScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.size(72.dp))
+        Spacer(modifier = Modifier.size(100.dp))
 
         Box(
             modifier = Modifier
-                .size(150.dp)
+                .size(200.dp)
                 .padding(16.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
@@ -133,7 +133,7 @@ fun ProfileScreen() {
                     painter = painter,
                     contentDescription = "Profil Resmi",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(200.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -142,7 +142,7 @@ fun ProfileScreen() {
                     painter = painterResource(id = R.drawable.image_pick_icon),
                     contentDescription = "Varsayılan Profil Resmi",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(200.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -153,7 +153,7 @@ fun ProfileScreen() {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF38B6FF))
+                    .background(Color(0xFF2F4F4F))
                     .align(Alignment.BottomEnd)
             ) {
                 Icon(
@@ -164,7 +164,7 @@ fun ProfileScreen() {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         Column(
             modifier = Modifier
@@ -199,7 +199,7 @@ fun ProfileScreen() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
