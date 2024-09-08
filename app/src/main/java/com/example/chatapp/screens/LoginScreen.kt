@@ -53,6 +53,8 @@ import com.example.chatapp.R
 import com.example.chatapp.models.Database
 import com.example.chatapp.navigations.Routes
 
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, database : Database){
@@ -67,23 +69,18 @@ fun LoginScreen(navController: NavController, database : Database){
     )
 
     val buttonOffset by animateDpAsState(
-        targetValue = if (isLoggedIn) 80.dp else 0.dp,
+        targetValue = if (isLoggedIn) 120.dp else 0.dp,
         animationSpec = tween(durationMillis = 300)
     )
 
-    // Kullanıcının giriş doğrulama sürecini tutar
     val authState = database.authState.observeAsState()
-    // Mevcut ortamı alır
     val context = LocalContext.current
 
-    // Kullanıcının giriş durumuna göre işlem yapar. Eğer giriş başarılıysa kullanıcı home ekranına yönlendirilir.
-    // Eğer giriş başarısızsa ekrana kısa bir süreliğine toast mesajı şeklinde neden başarısız olduğunu anlatan bir mesaj görünür
     LaunchedEffect(authState.value) {
         when(authState.value){
             is Database.AuthState.Authenticated -> navController.navigate(Routes.screenHome)
             is Database.AuthState.Error -> Toast.makeText(context,
                 (authState.value as Database.AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            // Diğer durumlar için hiçbir şey yapma
             else -> Unit
         }
     }
@@ -98,11 +95,11 @@ fun LoginScreen(navController: NavController, database : Database){
         Spacer(modifier = Modifier.height(156.dp))
 
         Icon(
-            painter = painterResource(id = R.drawable.welcome_icon),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "",
-            tint = Color(0xFF38B6FF),
+            tint = Color(0xFF778899),
             modifier = Modifier
-                .size(256.dp)
+                .size(240.dp)
                 .offset(y = iconOffset)
         )
 
@@ -123,22 +120,21 @@ fun LoginScreen(navController: NavController, database : Database){
                 modifier = Modifier
                     .fillMaxSize(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFEBEBEB),
-                    contentColor = Color(0xFF38B6FF)
+                    containerColor = Color(0xFFCBCBCB),
+                    contentColor = Color(0xFF778899)
                 ),
                 shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, Color(0xFF38B6FF)),
-                elevation = null
+                border = BorderStroke(2.dp, Color(0xFF778899)),
+                elevation = ButtonDefaults.buttonElevation(4.dp) // Butona gölge ekleme
             ) {
                 Text(
                     text = "Giriş yap",
                     style = TextStyle(fontSize = 16.sp),
-                    color = Color(0xFF38B6FF)
+                    color = Color.Black
                 )
             }
         }
 
-        // TextView'ların ve butonun kaybolmasını sağlamak için AnimatedVisibility kullanılır
         AnimatedVisibility(
             visible = !isLoggedIn,
             enter = fadeIn(tween(durationMillis = 300)),
@@ -147,7 +143,7 @@ fun LoginScreen(navController: NavController, database : Database){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(128.dp))
+                Spacer(modifier = Modifier.height(220.dp))
 
                 Text(
                     text = "from",
@@ -160,13 +156,12 @@ fun LoginScreen(navController: NavController, database : Database){
                     text = "yazilim.xyz",
                     style = TextStyle(
                         fontFamily = FontFamily(Font(R.font.alex_brush)),
-                        fontSize = 32.sp
+                        fontSize = 30.sp
                     )
                 )
             }
         }
 
-        // TextField'ların görünür olması
         AnimatedVisibility(
             visible = isLoggedIn,
             enter = fadeIn(tween(durationMillis = 300)),
@@ -180,28 +175,53 @@ fun LoginScreen(navController: NavController, database : Database){
                     .offset(y = (-225).dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(100.dp))
 
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
                     label = { Text("Kullanıcı Adı") },
+                    placeholder = { Text("Kullanıcı adınızı girin") }, // Placeholder ekledim
+                    leadingIcon = { // İkon ekleme
+                        Icon(
+                            painter = painterResource(id = R.drawable.user_icon),
+                            contentDescription = "Kullanıcı İkonu"
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(0.dp, Color.Transparent)
                         .background(Color.White),
+                    shape = RoundedCornerShape(10.dp), // Yuvarlatılmış köşeler
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF778899), // Odaklanıldığında renk değişimi
+                        unfocusedBorderColor = Color.Gray
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Şifre") },
+                    placeholder = { Text("Şifrenizi girin") }, // Placeholder ekledim
+                    leadingIcon = { // İkon ekleme
+                        Icon(
+                            painter = painterResource(id = R.drawable.pswrd_icon),
+                            contentDescription = "Şifre İkonu"
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(0.dp, Color.Transparent)
                         .background(Color.White),
+                    visualTransformation = PasswordVisualTransformation(), // Şifre gizleme
+                    shape = RoundedCornerShape(10.dp), // Yuvarlatılmış köşeler
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF778899), // Odaklanıldığında renk değişimi
+                        unfocusedBorderColor = Color.Gray
+                    )
                 )
             }
         }

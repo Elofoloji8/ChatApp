@@ -66,7 +66,7 @@ fun ChatAppTheme(
 
     LaunchedEffect(darkTheme) {
         systemUiController.setStatusBarColor(
-            color = if (darkTheme) Color.Black else Color(0xFF38B6FF),
+            color = if (darkTheme) Color.Black else Color(0xFF778899),
             darkIcons = !darkTheme // Dark theme'de ikonlar açık renkte olur
         )
     }
