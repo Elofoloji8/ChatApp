@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChatAppTheme{
                 AppNavigation(database)
-                //deneme2
+                //deneme3
             }
         }
     }
