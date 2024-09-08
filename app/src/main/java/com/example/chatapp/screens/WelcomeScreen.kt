@@ -35,7 +35,7 @@ fun WelcomeScreen(navController: NavController){
 
     Column( modifier = Modifier.
         fillMaxSize()
-        .background(Color(0xFF38B6FF)),
+        .background(Color(0xFF778899)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
 
