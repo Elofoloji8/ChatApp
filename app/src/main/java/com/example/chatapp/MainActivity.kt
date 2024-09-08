@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
         val database : Database by viewModels()
         setContent {
             ChatAppTheme{
+                //rdsgmvaewıudsghvıowaeubsgvuekjrsdv
                 AppNavigation(database)
             }
         }
